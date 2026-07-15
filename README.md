@@ -2,90 +2,148 @@
 
 ## Overview
 
-Medical AI Research Assistant Agent is a local-first research assistant for medical AI and computer vision researchers.
+Medical AI Research Assistant Agent is a research-oriented Agent system for medical AI and computer vision workflows.
 
-It combines:
+It supports:
 
-- LangGraph agent workflow
-- RAG knowledge retrieval
-- Tool calling
-- DeepSeek-compatible LLM report generation
+- Personal research knowledge management
+- Literature retrieval
+- Open-source project retrieval
+- LLM-assisted research report generation
 
-The system helps organize personal research notes, retrieve relevant Markdown logs, search external research sources, and generate structured research summaries.
+The project is built with:
 
-## Features
+- LangGraph
+- RAG
+- Tool Calling
+- ChromaDB
+- DeepSeek-compatible API integration
 
-- LangGraph Workflow
-- RAG Knowledge Retrieval
-- arXiv Search
-- GitHub Repository Search
-- LLM-based Research Report Generation
-- Local ChromaDB persistence
-- Mock LLM fallback for demos without API keys
+This is not a fully autonomous scientist or self-learning agent. It is a clear, modular research assistant workflow designed for local experimentation and portfolio demonstration.
 
 ## Architecture
 
-See [docs/architecture.md](docs/architecture.md) for the full architecture explanation.
+See [docs/architecture.md](docs/architecture.md) for a detailed explanation.
+
+![Architecture](docs/images/architecture.png)
 
 ```text
 User Query
-  -> Memory Retrieval
-  -> External Research Tools
-  -> LLM Report Generation
+  |
+  v
+LangGraph Workflow
+  |
+  v
+Memory Node -> RAG Retriever -> Chroma Vector Database
+  |
+  v
+Research Node -> Tool Registry -> arXiv API / GitHub API
+  |
+  v
+Report Node -> DeepSeek-compatible LLM -> Research Report
 ```
+
+The architecture follows a State-Node-Tool pattern:
+
+- State manages execution context.
+- Node performs one workflow step.
+- Tool provides external capabilities.
+- RAG retrieves personal research memory.
+- LLM fuses evidence into a structured report.
+
+## Features
+
+### Personal Research Memory
+
+Builds a local research memory from Markdown notes using a RAG pipeline and ChromaDB persistence.
+
+### External Research Tools
+
+Supports external research lookup through standardized tools:
+
+- arXiv paper search
+- GitHub repository search
+
+### LLM-based Report Generation
+
+Generates structured Markdown research reports through a DeepSeek-compatible LLM layer. If no API key is configured, the project falls back to `MockLLM` for local demos.
+
+### LangGraph Workflow
+
+Uses a simple LangGraph State-Node workflow to organize retrieval, tool calling, and report generation.
 
 ## Demo
 
-Example input:
+Example query:
 
 ```text
-总结近期 StereoVLA 相关工作
+Summarize recent StereoVLA-related research progress.
 ```
 
-The agent retrieves demo Markdown notes from `data/demo_logs/`, searches external research sources, and generates a Markdown report.
+Example reports:
 
-See [examples/demo_reports/example_1_stereo_vla_report.md](examples/demo_reports/example_1_stereo_vla_report.md).
+- [StereoVLA Research Report](examples/demo_reports/stereo_vla_research_report.md)
+- [Medical Vision Trend Report](examples/demo_reports/medical_vision_trend_report.md)
+- [World Model Analysis Report](examples/demo_reports/world_model_analysis_report.md)
+
+Screenshot placeholder:
+
+- [docs/screenshots/README.md](docs/screenshots/README.md)
 
 ## Installation
 
-Create and activate a virtual environment:
+1. Clone the repository:
+
+```bash
+git clone https://github.com/RoastDuckology/medical-research-agent-syf.git
+cd medical-research-agent-syf
+```
+
+2. Create and activate a virtual environment:
 
 ```bash
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
-Install dependencies:
+3. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Create local environment config:
+4. Configure environment variables:
 
 ```bash
 copy .env.example .env
 ```
 
-Optional: configure an LLM key in `.env`.
-
-```text
-DEEPSEEK_API_KEY=""
-DEEPSEEK_BASE_URL="https://api.deepseek.com"
-LLM_MODEL="deepseek-chat"
-```
-
-Run the demo:
+5. Run the demo:
 
 ```bash
 python app.py
 ```
 
-Run tests:
+6. Run tests:
 
 ```bash
 pytest
 ```
+
+## Configuration
+
+Key environment variables:
+
+```text
+DEEPSEEK_API_KEY=""
+DEEPSEEK_BASE_URL="https://api.deepseek.com"
+LLM_MODEL="deepseek-chat"
+GITHUB_TOKEN=""
+VECTOR_DB_PATH="data/vector_db"
+LOGS_DIR="data/demo_logs"
+```
+
+Do not upload real API keys. `.env` is ignored by `.gitignore`.
 
 ## Project Structure
 
@@ -97,17 +155,20 @@ llm/        Base LLM interface, MockLLM, DeepSeek-compatible provider
 config/     Environment-based settings
 data/       Demo logs and local vector database path
 examples/   Example generated reports
-docs/       Architecture documentation
+docs/       Architecture documentation and visual assets
+tests/      Unit tests for LLM, RAG, tools, and workflow
 ```
 
 ## Future Work
 
-- Planner node
-- Dynamic tool selection
-- Better source citation formatting
-- Streamlit or FastAPI UI
-- PDF ingestion
-- More robust evaluation and benchmark scripts
+Planned improvements:
 
-These features are not implemented in the current public demo.
+- Planner-based routing
+- Dynamic tool selection
+- Web interface
+- PDF ingestion
+- Better source citation formatting
+- Evaluation scripts for retrieval and report quality
+
+These are future plans and are not implemented in the current version.
 

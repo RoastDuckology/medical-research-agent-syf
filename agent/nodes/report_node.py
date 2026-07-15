@@ -16,12 +16,12 @@ def _build_report_prompt(state: ResearchState) -> str:
 
     return "\n\n".join(
         [
-            "请基于以下信息生成一份中文 Markdown 研究报告。",
-            "报告需要包含：研究问题、个人工作记录、外部论文/代码线索、综合分析、下一步建议。",
-            "不要编造未提供的信息；如果信息不足，请明确说明。",
-            f"用户问题：{state['query']}",
-            f"个人工作记录：\n{state.get('memory', '')}",
-            "结构化外部研究结果：",
+            "Generate a structured Markdown research report based on the information below.",
+            "The report should include: research question, personal research memory, external paper/code signals, integrated analysis, and next-step suggestions.",
+            "Do not invent unsupported facts. If information is insufficient, state that clearly.",
+            f"User query: {state['query']}",
+            f"Personal research memory:\n{state.get('memory', '')}",
+            "Structured external research results:",
             json.dumps(state.get("research_results", []), ensure_ascii=False, indent=2),
         ]
     )
@@ -34,3 +34,4 @@ def report_node(state: ResearchState) -> dict[str, str]:
     llm = get_llm()
     report = llm.generate(prompt)
     return {"report": report}
+

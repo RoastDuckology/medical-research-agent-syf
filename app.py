@@ -1,4 +1,4 @@
-"""Application entry point for Phase 4.1 research tool workflow verification."""
+"""Application entry point for the public demo."""
 
 from agent.workflow import invoke
 from rag.indexer import build_or_update_index
@@ -19,7 +19,7 @@ def main() -> None:
         )
 
     initial_state = {
-        "query": "总结近期 StereoVLA 相关工作",
+        "query": "Summarize recent StereoVLA-related research progress.",
         "memory": "",
         "retrieved_documents": [],
         "research_results": [],
@@ -60,3 +60,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

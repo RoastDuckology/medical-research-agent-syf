@@ -1,14 +1,14 @@
 # Architecture
 
-This project implements a personal research assistant agent for medical AI and computer vision research.
+Medical AI Research Assistant Agent is organized as a compact LangGraph workflow. It combines local personal memory retrieval, external research tools, and LLM-based report generation.
 
-## Workflow
+## System Flow
 
 ```text
 User Query
   |
   v
-LangGraph Runtime
+LangGraph Workflow
   |
   v
 Memory Node
@@ -17,55 +17,77 @@ Memory Node
 RAG Retriever
   |
   v
+Chroma Vector Database
+  |
+  v
 Research Node
   |
   v
 Tool Registry
   |
   v
-External Tools
+arXiv API / GitHub API
   |
   v
-LLM Report Generation
+Report Node
+  |
+  v
+DeepSeek-compatible LLM
+  |
+  v
+Research Report
 ```
 
-## State
+## Components
 
-`ResearchState` is the shared data contract between LangGraph nodes. It contains:
+### State
+
+`ResearchState` is the shared execution state passed between LangGraph nodes.
+
+It contains:
 
 - `query`: user question.
 - `memory`: formatted personal research memory.
-- `retrieved_documents`: structured chunks retrieved from the local knowledge base.
-- `research_results`: structured external research results from tools.
+- `retrieved_documents`: structured RAG results.
+- `research_results`: external paper and repository results.
 - `report`: final generated Markdown report.
 
-## Nodes
+### Node
 
-`memory_node` retrieves relevant personal research notes from the local vector database.
+Nodes are deterministic workflow steps:
 
-`research_node` calls registered research tools through the tool registry. It does not perform planning or autonomous tool selection.
+- `memory_node`: retrieves relevant personal notes.
+- `research_node`: calls registered research tools.
+- `report_node`: builds a report prompt and calls the LLM provider.
 
-`report_node` builds a structured prompt from memory and research results, then calls the configured LLM provider.
+The current workflow does not include a Planner or dynamic routing.
 
-## RAG Memory
+### Tool
 
-The RAG pipeline loads Markdown notes, splits them into chunks, embeds them with a local Hugging Face embedding model, and stores them in ChromaDB.
-
-```text
-Markdown -> Loader -> Splitter -> Embedding -> Chroma -> Retriever
-```
-
-## Tools
-
-Tools follow a small `BaseTool` interface:
+Tools expose external capabilities through a common `BaseTool` interface.
 
 ```python
 run(**kwargs) -> list[dict]
 ```
 
-The registry keeps the research node independent from concrete tool implementations.
+`ToolRegistry` keeps the research node independent from concrete tool implementations.
 
-## LLM Layer
+### RAG
 
-The LLM layer uses a common `BaseLLM` interface. If `DEEPSEEK_API_KEY` is configured, the project uses `DeepSeekLLM`. Otherwise, it falls back to `MockLLM` so the demo remains runnable without credentials.
+The RAG module builds personal memory from Markdown logs:
+
+```text
+Markdown -> Loader -> Splitter -> Embedding -> Chroma -> Retriever
+```
+
+This allows the agent to answer based on local research notes rather than only external sources.
+
+### LLM
+
+The LLM layer uses a `BaseLLM` interface. The project supports:
+
+- `DeepSeekLLM` for real report generation.
+- `MockLLM` for local demos without credentials.
+
+The report node depends on the interface, not on a specific provider.
 

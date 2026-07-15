@@ -8,16 +8,16 @@ def _format_memory(results: list[dict]) -> str:
     """Convert retrieved chunks into readable memory text."""
 
     if not results:
-        return "未从个人工作日志中检索到相关内容。"
+        return "No relevant content was retrieved from personal research logs."
 
     blocks: list[str] = []
     for index, result in enumerate(results, start=1):
         blocks.append(
             "\n".join(
                 [
-                    f"{index}. 日期：{result.get('date', '')}",
-                    f"   来源文件：{result.get('filename', '')}",
-                    f"   正文片段：{result.get('content', '').strip()}",
+                    f"{index}. Date: {result.get('date', '')}",
+                    f"   Source file: {result.get('filename', '')}",
+                    f"   Content: {result.get('content', '').strip()}",
                 ]
             )
         )
@@ -32,3 +32,4 @@ def memory_node(state: ResearchState) -> dict:
         "retrieved_documents": results,
         "memory": _format_memory(results),
     }
+
