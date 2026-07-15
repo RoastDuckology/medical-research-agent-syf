@@ -124,11 +124,34 @@ copy .env.example .env
 python app.py
 ```
 
-6. Run tests:
+6. Run the web demo:
+
+```bash
+streamlit run frontend/streamlit_app.py
+```
+
+7. Run tests:
 
 ```bash
 pytest
 ```
+
+## Web Demo
+
+The Streamlit web demo provides a lightweight interface for the existing Agent workflow.
+
+```bash
+streamlit run frontend/streamlit_app.py
+```
+
+The page shows:
+
+- Query
+- Retrieved Memory
+- External Research
+- Final Report
+
+The frontend does not call Chroma, arXiv, GitHub, or DeepSeek directly. It invokes the existing LangGraph workflow and renders the returned state.
 
 ## Configuration
 
@@ -156,6 +179,7 @@ config/     Environment-based settings
 data/       Demo logs and local vector database path
 examples/   Example generated reports
 docs/       Architecture documentation and visual assets
+frontend/   Streamlit web demo layer
 tests/      Unit tests for LLM, RAG, tools, and workflow
 ```
 
@@ -165,10 +189,9 @@ Planned improvements:
 
 - Planner-based routing
 - Dynamic tool selection
-- Web interface
+- Richer web interface
 - PDF ingestion
 - Better source citation formatting
 - Evaluation scripts for retrieval and report quality
 
 These are future plans and are not implemented in the current version.
-
