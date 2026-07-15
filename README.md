@@ -153,6 +153,40 @@ The page shows:
 
 The frontend does not call Chroma, arXiv, GitHub, or DeepSeek directly. It invokes the existing LangGraph workflow and renders the returned state.
 
+## Streamlit Cloud Deployment
+
+This repository can be deployed on Streamlit Cloud with the existing frontend entry point:
+
+```text
+frontend/streamlit_app.py
+```
+
+Deployment steps:
+
+1. Push this repository to GitHub.
+2. Open Streamlit Cloud and create a new app.
+3. Select the GitHub repository.
+4. Set the main file path to:
+
+```text
+frontend/streamlit_app.py
+```
+
+5. Add secrets or environment variables in Streamlit Cloud settings:
+
+```text
+DEEPSEEK_API_KEY="your-api-key"
+DEEPSEEK_BASE_URL="https://api.deepseek.com"
+LLM_MODEL="deepseek-chat"
+GITHUB_TOKEN=""
+VECTOR_DB_PATH="data/vector_db"
+LOGS_DIR="data/demo_logs"
+```
+
+6. Deploy the app.
+
+Do not commit `.env` or real API keys. For public demos without a DeepSeek key, the app falls back to `MockLLM`.
+
 ## Configuration
 
 Key environment variables:
