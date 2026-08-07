@@ -21,6 +21,10 @@ The project is built with:
 
 This is not a fully autonomous scientist or self-learning agent. It is a clear, modular research assistant workflow designed for local experimentation and portfolio demonstration.
 
+## Repository Status
+
+This public repository uses synthetic demo logs and sanitized example outputs. It does not include private research notes, real medical data, local vector databases, or API keys.
+
 ## Architecture
 
 See [docs/architecture.md](docs/architecture.md) for a detailed explanation.
@@ -202,6 +206,8 @@ LOGS_DIR="data/demo_logs"
 
 Do not upload real API keys. `.env` is ignored by `.gitignore`.
 
+For OpenAI-compatible third-party gateways, set `DEEPSEEK_BASE_URL` to the provider's `/v1` endpoint and set `LLM_MODEL` to a model name available from that provider.
+
 ## Project Structure
 
 ```text
@@ -229,3 +235,7 @@ Planned improvements:
 - Evaluation scripts for retrieval and report quality
 
 These are future plans and are not implemented in the current version.
+
+## License
+
+This project is released under the MIT License. See [LICENSE](LICENSE).
