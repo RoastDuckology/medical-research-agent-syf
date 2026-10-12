@@ -35,6 +35,7 @@ def test_deepseek_llm_parses_chat_completion_response(monkeypatch):
 
     monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
     monkeypatch.setenv("LLM_MODEL", "deepseek-chat")
+    monkeypatch.setenv("LLM_FAILURE_COOLDOWN_SECONDS", "0")
     monkeypatch.setattr("requests.post", fake_post)
 
     assert DeepSeekLLM().generate("hello") == "# Report"

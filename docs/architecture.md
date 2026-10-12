@@ -1,93 +1,76 @@
 # Architecture
 
-Medical AI Research Assistant Agent is organized as a compact LangGraph workflow. It combines local personal memory retrieval, external research tools, and LLM-based report generation.
+The project is a single-agent LangGraph workflow with specialized nodes, explicit shared state, conditional routing, source-grounded context construction, and post-generation reflection.
 
-## System Flow
-
-```text
-User Query
-  |
-  v
-LangGraph Workflow
-  |
-  v
-Memory Node
-  |
-  v
-RAG Retriever
-  |
-  v
-Chroma Vector Database
-  |
-  v
-Research Node
-  |
-  v
-Tool Registry
-  |
-  v
-arXiv API / GitHub API
-  |
-  v
-Report Node
-  |
-  v
-DeepSeek-compatible LLM
-  |
-  v
-Research Report
-```
-
-## Components
-
-### State
-
-`ResearchState` is the shared execution state passed between LangGraph nodes.
-
-It contains:
-
-- `query`: user question.
-- `memory`: formatted personal research memory.
-- `retrieved_documents`: structured RAG results.
-- `research_results`: external paper and repository results.
-- `report`: final generated Markdown report.
-
-### Node
-
-Nodes are deterministic workflow steps:
-
-- `memory_node`: retrieves relevant personal notes.
-- `research_node`: calls registered research tools.
-- `report_node`: builds a report prompt and calls the LLM provider.
-
-The current workflow does not include a Planner or dynamic routing.
-
-### Tool
-
-Tools expose external capabilities through a common `BaseTool` interface.
-
-```python
-run(**kwargs) -> list[dict]
-```
-
-`ToolRegistry` keeps the research node independent from concrete tool implementations.
-
-### RAG
-
-The RAG module builds personal memory from Markdown logs:
+## Graph
 
 ```text
-Markdown -> Loader -> Splitter -> Embedding -> Chroma -> Retriever
+START
+  |
+  v
+Planner Node
+  |-- task_type=daily_brief --> Daily Brief Node --> Reflection Node --> END
+  |
+  `-- task_type=research ----> Memory Node
+                                      |
+                                      v
+                                Research Node
+                                      |
+                                      v
+                                 Report Node
+                                      |
+                                      v
+                               Reflection Node --> END
 ```
 
-This allows the agent to answer based on local research notes rather than only external sources.
+## State
 
-### LLM
+`ResearchState` carries:
 
-The LLM layer uses a `BaseLLM` interface. The project supports:
+- query, task type, plan, and selected tools;
+- retrieved RAG documents and SQLite interaction-memory records;
+- external research results and a compact tool trace;
+- generated report, provider error, reflection, progress, and context summary.
 
-- `DeepSeekLLM` for real report generation.
-- `MockLLM` for local demos without credentials.
+Nodes receive the current state and return partial updates that LangGraph merges into the shared state.
 
-The report node depends on the interface, not on a specific provider.
+## Planner and Tools
 
+The planner uses deterministic rules to classify research versus daily-brief tasks and to select arXiv, GitHub, or local-only execution. The research node resolves selected tools through `ToolRegistry`, performs one retry for transient failures, and returns a degraded structured result when recovery fails.
+
+Tool execution supports three modes:
+
+- `live`: real arXiv and GitHub APIs;
+- `recorded`: deterministic JSON replay for reproducible evaluation;
+- `fault_injection`: timeout, HTTP 500, SSL, rate-limit, and permanent failures.
+
+## Retrieval
+
+Local evidence can come from Markdown, PDF pages, paper notes, and experiment logs. The retrieval pipeline combines:
+
+1. normalized BGE dense embeddings stored in Chroma;
+2. an in-process BM25 scorer;
+3. weighted score fusion and metadata-aware importance;
+4. a Top-20 candidate pool;
+5. optional lightweight lexical reranking;
+6. optional deterministic multi-query expansion.
+
+PDF metadata preserves file, page range, section title, heading path, and source URLs.
+
+## Context and Generation
+
+`ContextBuilder` converts internal state into typed context packets, applies per-source token budgets, compacts oversized packets, and renders a source-aware prompt. DeepSeek is accessed through an OpenAI-compatible Chat Completions endpoint. Provider failures use bounded retries, model fallback, a cooldown cache, and ultimately a deterministic local fallback report.
+
+The report node appends a machine-checkable source appendix. Reflection checks report availability, source preservation, fallback use, and uncertainty indicators.
+
+## Evaluation
+
+Versioned JSONL datasets and command-line evaluators cover:
+
+- Recall@K, Hit@K, MRR, PDF page hit, and OOD false positives;
+- answer correctness, completeness, groundedness, and refusal accuracy;
+- citation filename checks, citation coverage, and claim-source format binding;
+- routing, tool selection, trace validity, and task completion;
+- deterministic tool-failure recovery.
+
+Metric definitions, denominators, current results, and known limitations are documented in `evaluation/CURRENT_RESULTS.md`.

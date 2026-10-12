@@ -1,0 +1,44 @@
+[
+  {
+    "keywords": ["stereovla", "surgical", "vla"],
+    "results": [
+      {
+        "type": "paper",
+        "source": "arxiv",
+        "title": "StereoVLA-style surgical vision-language-action research placeholder",
+        "abstract": "Recorded response for reproducible arXiv workflow evaluation.",
+        "url": "https://arxiv.org/abs/recorded-stereovla",
+        "authors": ["Recorded Fixture"],
+        "published": "2026-08-01T00:00:00Z"
+      }
+    ]
+  },
+  {
+    "keywords": ["jepa", "world model", "planning"],
+    "results": [
+      {
+        "type": "paper",
+        "source": "arxiv",
+        "title": "JEPA and world-model planning recorded paper",
+        "abstract": "Recorded response for JEPA planning workflow tests.",
+        "url": "https://arxiv.org/abs/recorded-jepa",
+        "authors": ["Recorded Fixture"],
+        "published": "2026-08-02T00:00:00Z"
+      }
+    ]
+  },
+  {
+    "keywords": ["medical", "agent", "endotap", "leworldmodel", "arxiv", "论文"],
+    "results": [
+      {
+        "type": "paper",
+        "source": "arxiv",
+        "title": "Medical AI agent recorded paper",
+        "abstract": "Recorded response for medical AI literature workflow tests.",
+        "url": "https://arxiv.org/abs/recorded-medical-agent",
+        "authors": ["Recorded Fixture"],
+        "published": "2026-08-03T00:00:00Z"
+      }
+    ]
+  }
+]

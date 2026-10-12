@@ -1,0 +1,5 @@
+{"id": "trust-01", "query": "In the LeWorldModel paper, how is CEM used for planning?", "required_claims": ["CEM", "planning"], "required_citations": ["2603.19312_leworldmodel.pdf"], "required_locations": ["page:"]}
+{"id": "trust-02", "query": "?? StereoVLA ?????????????", "required_claims": ["StereoVLA", "VLA"], "required_citations": ["2512.21970_stereovla.pdf"], "required_locations": ["file:"]}
+{"id": "trust-03", "query": "FoundationStereo ???????????", "required_claims": ["FoundationStereo", "disparity"], "required_citations": ["2501.09898_foundationstereo.pdf"], "required_locations": ["file:"]}
+{"id": "trust-04", "query": "Endo-TTAP ??????????", "required_claims": ["Endo-TTAP", "tracking"], "required_citations": ["2503.22394_endo_ttap.pdf"], "required_locations": ["file:"]}
+{"id": "trust-05", "query": "I-JEPA ? Joint-Embedding Predictive Architecture ????", "required_claims": ["Joint-Embedding Predictive Architecture", "I-JEPA"], "required_citations": ["2301.08243_i_jepa.pdf"], "required_locations": ["file:"]}

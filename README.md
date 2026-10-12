@@ -1,241 +1,157 @@
 # Medical AI Research Assistant Agent
 
-## Overview
+A source-grounded research agent for medical AI and computer-vision workflows. The project combines conditional LangGraph routing, hybrid local retrieval, external research tools, bounded-context report generation, reflection, and reproducible evaluation.
 
-Medical AI Research Assistant Agent is a research-oriented Agent system for medical AI and computer vision workflows.
+This public repository contains sanitized demo data and fixed evaluation cases. It does **not** contain private research notes, API keys, local vector databases, interaction-memory databases, or copyrighted paper PDFs.
 
-It supports:
+## Highlights
 
-- Personal research knowledge management
-- Literature retrieval
-- Open-source project retrieval
-- LLM-assisted research report generation
-
-The project is built with:
-
-- LangGraph
-- RAG
-- Tool Calling
-- ChromaDB
-- DeepSeek-compatible API integration
-
-This is not a fully autonomous scientist or self-learning agent. It is a clear, modular research assistant workflow designed for local experimentation and portfolio demonstration.
-
-## Repository Status
-
-This public repository uses synthetic demo logs and sanitized example outputs. It does not include private research notes, real medical data, local vector databases, or API keys.
+- **Conditional agent workflow**: planner, local memory/RAG, external research, report generation, daily brief, and reflection nodes.
+- **Hybrid retrieval**: dense embeddings plus BM25, Top-20 candidate pooling, lightweight reranking, and adaptive multi-query expansion.
+- **PDF and Markdown ingestion**: page, file, section, and heading metadata are preserved for source-aware answers.
+- **Tool orchestration**: arXiv, GitHub, and daily-brief tools behind a common registry.
+- **Reliability controls**: bounded retries, provider cooldown, fallback generation, recorded-tool replay, and deterministic fault injection.
+- **Evaluation suite**: retrieval, local QA, routing, citation-format, refusal, efficiency, and failure-recovery metrics.
 
 ## Architecture
 
-See [docs/architecture.md](docs/architecture.md) for a detailed explanation.
-
-![Architecture](docs/images/architecture.png)
-
 ```text
 User Query
-  |
-  v
-LangGraph Workflow
-  |
-  v
-Memory Node -> RAG Retriever -> Chroma Vector Database
-  |
-  v
-Research Node -> Tool Registry -> arXiv API / GitHub API
-  |
-  v
-Report Node -> DeepSeek-compatible LLM -> Research Report
+    |
+    v
+Planner Node
+    |-- daily brief --> Daily Brief Node --> Reflection --> END
+    |
+    `-- research ----> Memory Node
+                           |
+                           v
+                     Research Node
+                           |
+                           v
+                      Report Node
+                           |
+                           v
+                    Reflection Node --> END
 ```
 
-The architecture follows a State-Node-Tool pattern:
+The planner uses deterministic, inspectable routing rules. It selects only the tools needed for a query. This is a single-agent LangGraph workflow with specialized nodes, not a multi-agent system.
 
-- State manages execution context.
-- Node performs one workflow step.
-- Tool provides external capabilities.
-- RAG retrieves personal research memory.
-- LLM fuses evidence into a structured report.
-
-## Features
-
-### Personal Research Memory
-
-Builds a local research memory from Markdown notes using a RAG pipeline and ChromaDB persistence.
-
-### External Research Tools
-
-Supports external research lookup through standardized tools:
-
-- arXiv paper search
-- GitHub repository search
-
-### LLM-based Report Generation
-
-Generates structured Markdown research reports through a DeepSeek-compatible LLM layer. If no API key is configured, the project falls back to `MockLLM` for local demos.
-
-### LangGraph Workflow
-
-Uses a simple LangGraph State-Node workflow to organize retrieval, tool calling, and report generation.
-
-## Demo
-
-Example query:
+## Retrieval Pipeline
 
 ```text
-Summarize recent StereoVLA-related research progress.
+Markdown / PDF
+    -> metadata-aware chunking
+    -> BGE dense embeddings + Chroma
+    -> BM25 keyword retrieval
+    -> candidate fusion (0.7 dense / 0.3 keyword)
+    -> Top-20 candidate pool
+    -> lightweight lexical reranker
+    -> Top-K evidence
 ```
 
-Example reports:
+Multi-query expansion is implemented as a lightweight deterministic query expander. The adaptive evaluation mode enables expansion only for complex queries.
 
-- [StereoVLA Research Report](examples/demo_reports/stereo_vla_research_report.md)
-- [Medical Vision Trend Report](examples/demo_reports/medical_vision_trend_report.md)
-- [World Model Analysis Report](examples/demo_reports/world_model_analysis_report.md)
+## Reproducible Evaluation
 
-Screenshot placeholder:
+The repository includes versioned, sanitized evaluation cases and scripts under `data/eval/` and `evaluation/`.
 
-- [docs/screenshots/README.md](docs/screenshots/README.md)
+Current fixed retrieval results on 60 medical-AI research cases:
+
+| Mode | Recall@5 | MRR |
+|---|---:|---:|
+| Dense-only baseline | 55.00% | 0.4644 |
+| Dense + BM25 | 61.67% | 0.5200 |
+| Hybrid + lightweight rerank | 63.33% | 0.5339 |
+| Adaptive MQE + rerank | 63.33% | 0.5339 |
+
+The real-LLM QA run used a fixed `deepseek-chat` model on 60 frozen tasks. Answer correctness and completeness were 94.00% on the 50 answer-labeled tasks; structure compliance was 95.00% across all 60 tasks. These metrics are reported separately from end-to-end task completion and citation accuracy. See [evaluation/CURRENT_RESULTS.md](evaluation/CURRENT_RESULTS.md) for definitions, denominators, limitations, and commands.
 
 ## Installation
 
-1. Clone the repository:
-
-```bash
-git clone https://github.com/RoastDuckology/medical-research-agent-syf.git
-cd medical-research-agent-syf
-```
-
-2. Create and activate a virtual environment:
-
-```bash
+```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-```
-
-3. Install dependencies:
-
-```bash
 pip install -r requirements.txt
+Copy-Item .env.example .env
 ```
 
-4. Configure environment variables:
+The default embedding model is `BAAI/bge-small-zh-v1.5`. Its first use may require a model download.
 
-```bash
-copy .env.example .env
+## Usage
+
+Build the local index from the included synthetic Markdown logs:
+
+```powershell
+python -m rag.indexer
 ```
 
-5. Run the demo:
+Run an interactive CLI:
 
-```bash
+```powershell
 python app.py
 ```
 
-6. Run the web demo:
+Run one query:
 
-```bash
+```powershell
+python app.py --query "Summarize the local StereoVLA research notes"
+```
+
+Run the Streamlit UI:
+
+```powershell
 streamlit run frontend/streamlit_app.py
 ```
 
-7. Run tests:
+Without `DEEPSEEK_API_KEY`, the project uses `MockLLM` so the workflow remains locally runnable.
 
-```bash
-pytest
+## Evaluation Commands
+
+Retrieval ablation:
+
+```powershell
+python -m evaluation.evaluate_rag --cases data/eval/rag_eval_cases_v1.jsonl --mode all --top-k 5 --disable-domain-guard --output evaluation/rag_results.local.json
 ```
 
-## Web Demo
+Recorded-tool workflow evaluation:
 
-The Streamlit web demo provides a lightweight interface for the existing Agent workflow.
-
-```bash
-streamlit run frontend/streamlit_app.py
+```powershell
+python -m evaluation.evaluate_workflow --cases data/eval/agent_routing_cases_v1.jsonl --recorded-tools --output evaluation/workflow_results.local.json
 ```
 
-The page shows:
+Failure-recovery evaluation:
 
-- Query
-- Retrieved Memory
-- External Research
-- Final Report
-
-The frontend does not call Chroma, arXiv, GitHub, or DeepSeek directly. It invokes the existing LangGraph workflow and renders the returned state.
-
-## Streamlit Cloud Deployment
-
-This repository can be deployed on Streamlit Cloud with the existing frontend entry point:
-
-```text
-frontend/streamlit_app.py
+```powershell
+python -m evaluation.evaluate_failure_recovery --cases data/eval/failure_recovery_cases_v1.jsonl --output evaluation/failure_recovery.local.json
 ```
 
-Deployment steps:
+Run tests:
 
-1. Push this repository to GitHub.
-2. Open Streamlit Cloud and create a new app.
-3. Select the GitHub repository.
-4. Set the main file path to:
-
-```text
-frontend/streamlit_app.py
+```powershell
+pytest -q
 ```
 
-5. Add secrets or environment variables in Streamlit Cloud settings:
+## Public Data Policy
 
-```text
-DEEPSEEK_API_KEY="your-api-key"
-DEEPSEEK_BASE_URL="https://api.deepseek.com"
-LLM_MODEL="deepseek-chat"
-GITHUB_TOKEN=""
-VECTOR_DB_PATH="data/vector_db"
-LOGS_DIR="data/demo_logs"
-```
+The repository intentionally excludes:
 
-6. Deploy the app.
+- `.env` and all credentials;
+- Chroma persistence directories;
+- SQLite interaction-memory databases;
+- private experiment logs and notes;
+- paper PDFs and extracted full-text caches;
+- generated reports containing private context.
 
-Do not commit `.env` or real API keys. For public demos without a DeepSeek key, the app falls back to `MockLLM`.
+To test PDF ingestion, place documents locally under `data/papers/`; those files remain ignored by Git.
 
-## Configuration
+## Known Limitations
 
-Key environment variables:
-
-```text
-DEEPSEEK_API_KEY=""
-DEEPSEEK_BASE_URL="https://api.deepseek.com"
-LLM_MODEL="deepseek-chat"
-GITHUB_TOKEN=""
-VECTOR_DB_PATH="data/vector_db"
-LOGS_DIR="data/demo_logs"
-```
-
-Do not upload real API keys. `.env` is ignored by `.gitignore`.
-
-For OpenAI-compatible third-party gateways, set `DEEPSEEK_BASE_URL` to the provider's `/v1` endpoint and set `LLM_MODEL` to a model name available from that provider.
-
-## Project Structure
-
-```text
-agent/      LangGraph state, graph, workflow, and nodes
-rag/        Markdown loader, splitter, embeddings, Chroma vector store, retriever
-tools/      Tool interface, registry, arXiv tool, GitHub tool
-llm/        Base LLM interface, MockLLM, DeepSeek-compatible provider
-config/     Environment-based settings
-data/       Demo logs and local vector database path
-examples/   Example generated reports
-docs/       Architecture documentation and visual assets
-frontend/   Streamlit web demo layer
-tests/      Unit tests for LLM, RAG, tools, and workflow
-```
-
-## Future Work
-
-Planned improvements:
-
-- Planner-based routing
-- Dynamic tool selection
-- Richer web interface
-- PDF ingestion
-- Better source citation formatting
-- Evaluation scripts for retrieval and report quality
-
-These are future plans and are not implemented in the current version.
+- The planner is rule-based and does not cover arbitrary user intent.
+- The reranker is a lightweight lexical scorer, not a trained cross-encoder.
+- Adaptive MQE matched, but did not exceed, the best hybrid-rerank result on the current retrieval set.
+- Citation-format compliance is stronger than semantic citation accuracy; manual citation-support auditing remains incomplete.
+- Real-provider evaluations can be affected by timeout, 503, and model-access failures, which are recorded separately rather than silently mixed with fallback outputs.
 
 ## License
 
-This project is released under the MIT License. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

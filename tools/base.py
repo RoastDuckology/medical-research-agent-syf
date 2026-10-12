@@ -13,3 +13,11 @@ class BaseTool(ABC):
     @abstractmethod
     def run(self, **kwargs: Any) -> list[dict]:
         """Run the tool and return structured results."""
+
+
+class ToolTransientError(RuntimeError):
+    """A retryable tool failure such as timeout, 500, or SSL interruption."""
+
+
+class ToolPermanentError(RuntimeError):
+    """A non-retryable tool failure such as permission or invalid configuration."""

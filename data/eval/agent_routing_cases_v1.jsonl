@@ -1,0 +1,30 @@
+{"id": "route-01", "query": "总结当前实验进度记录中 StereoVLA 和 LeWM 的主要结论", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-02", "query": "In the LeWorldModel paper, how is CEM used for planning?", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-03", "query": "询问 data/papers 中 I-JEPA 的核心思想", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-04", "query": "根据本地知识库总结 FoundationStereo 对项目的价值", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-05", "query": "当前实验记录中下一步安排是什么", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-06", "query": "PDF 中 SurgVLA-Bench 提出了什么 benchmark", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-07", "query": "比较 StereoVLA 和 SurgVLA-Bench 的关系", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-08", "query": "根据历史记忆总结 RAG 改造进展", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-09", "query": "总结上下文预算设计", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-10", "query": "查找本地记录里的风险路线", "expected_task_type": "research", "expected_tools": []}
+{"id": "route-11", "query": "search arxiv StereoVLA surgical VLA papers", "expected_task_type": "research", "expected_tools": ["arxiv"]}
+{"id": "route-12", "query": "查找 arxiv 上 LeWorldModel 相关论文", "expected_task_type": "research", "expected_tools": ["arxiv"]}
+{"id": "route-13", "query": "search arxiv JEPA planning world model", "expected_task_type": "research", "expected_tools": ["arxiv"]}
+{"id": "route-14", "query": "查找最新 arxiv 医疗 AI agent 论文", "expected_task_type": "research", "expected_tools": ["arxiv"]}
+{"id": "route-15", "query": "search arxiv EndoTAP surgical tracking", "expected_task_type": "research", "expected_tools": ["arxiv"]}
+{"id": "route-16", "query": "find github surgical world model code", "expected_task_type": "research", "expected_tools": ["github"]}
+{"id": "route-17", "query": "查找 GitHub 上 StereoVLA 开源代码", "expected_task_type": "research", "expected_tools": ["github"]}
+{"id": "route-18", "query": "search github JEPA world model implementation", "expected_task_type": "research", "expected_tools": ["github"]}
+{"id": "route-19", "query": "查找 GitHub 上 medical research agent 项目", "expected_task_type": "research", "expected_tools": ["github"]}
+{"id": "route-20", "query": "find github FoundationStereo repository", "expected_task_type": "research", "expected_tools": ["github"]}
+{"id": "route-21", "query": "search arxiv and github StereoVLA implementation", "expected_task_type": "research", "expected_tools": ["arxiv", "github"]}
+{"id": "route-22", "query": "查找 arxiv 和 GitHub 上 surgical VLA benchmark", "expected_task_type": "research", "expected_tools": ["arxiv", "github"]}
+{"id": "route-23", "query": "generate daily brief", "expected_task_type": "daily_brief", "expected_tools": ["daily_brief"]}
+{"id": "route-24", "query": "生成今日 AI 简报", "expected_task_type": "daily_brief", "expected_tools": ["daily_brief"]}
+{"id": "route-25", "query": "生成近7天医疗AI日报", "expected_task_type": "daily_brief", "expected_tools": ["daily_brief"]}
+{"id": "route-26", "query": "帮我做每日 AI 简报", "expected_task_type": "daily_brief", "expected_tools": ["daily_brief"]}
+{"id": "route-27", "query": "daily brief for surgical AI papers", "expected_task_type": "daily_brief", "expected_tools": ["daily_brief"]}
+{"id": "route-28", "query": "查找今天 AI 简报里有哪些论文", "expected_task_type": "daily_brief", "expected_tools": ["daily_brief"]}
+{"id": "route-29", "query": "生成 GitHub arxiv AI 日报", "expected_task_type": "daily_brief", "expected_tools": ["daily_brief"]}
+{"id": "route-30", "query": "给我一份近15天 AI research brief", "expected_task_type": "daily_brief", "expected_tools": ["daily_brief"]}

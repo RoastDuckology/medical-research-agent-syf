@@ -1,0 +1,32 @@
+[
+  {
+    "keywords": ["stereovla", "surgical", "world model", "foundationstereo"],
+    "results": [
+      {
+        "type": "repository",
+        "source": "github",
+        "name": "recorded/surgical-world-model",
+        "description": "Recorded GitHub response for surgical world model workflow tests.",
+        "stars": 128,
+        "url": "https://github.com/recorded/surgical-world-model",
+        "language": "Python",
+        "updated_at": "2026-08-01T00:00:00Z"
+      }
+    ]
+  },
+  {
+    "keywords": ["jepa", "medical research agent", "github", "代码", "仓库"],
+    "results": [
+      {
+        "type": "repository",
+        "source": "github",
+        "name": "recorded/research-agent-fixture",
+        "description": "Recorded GitHub response for agent and JEPA workflow tests.",
+        "stars": 96,
+        "url": "https://github.com/recorded/research-agent-fixture",
+        "language": "Python",
+        "updated_at": "2026-08-02T00:00:00Z"
+      }
+    ]
+  }
+]

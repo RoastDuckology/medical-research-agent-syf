@@ -1,61 +1,73 @@
-"""Application entry point for the public demo."""
+"""Command-line chat entry point for the medical research assistant."""
 
-from agent.workflow import invoke
-from rag.indexer import build_or_update_index
-from rag.vector_store import vector_store_count
+from __future__ import annotations
+
+import argparse
+
+from agent.chat_service import ask_agent, ensure_knowledge_base
+
+
+EXIT_COMMANDS = {"exit", "quit", "q", "退出"}
 
 
 def main() -> None:
-    """Build the local index if needed, then run the LangGraph workflow."""
+    """Run one-shot or interactive chat mode."""
 
-    if vector_store_count() == 0:
-        print("Knowledge base is empty. Building index...")
-        stats = build_or_update_index()
+    parser = argparse.ArgumentParser(description="Medical AI research assistant")
+    parser.add_argument("--query", "-q", help="Ask one question and exit.")
+    parser.add_argument(
+        "--chat",
+        action="store_true",
+        help="Start an interactive chat loop. This is the default when --query is omitted.",
+    )
+    args = parser.parse_args()
+
+    stats = ensure_knowledge_base()
+    if stats:
         print(
-            "Index built: "
-            f"{stats['markdown_files']} Markdown files, "
-            f"{stats['chunks']} chunks, "
+            "Knowledge base built: "
+            f"{stats['markdown_files']} files, {stats['chunks']} chunks, "
             f"{stats['added']} vectors added."
         )
 
-    initial_state = {
-        "query": "Summarize recent StereoVLA-related research progress.",
-        "memory": "",
-        "retrieved_documents": [],
-        "research_results": [],
-        "report": "",
-    }
-    final_state = invoke(initial_state)
+    if args.query:
+        _ask_once(args.query)
+        return
 
-    print("\nQuery")
-    print(final_state["query"])
+    _interactive_loop()
 
-    print("\nRetrieved Documents")
-    if final_state["retrieved_documents"]:
-        for index, document in enumerate(final_state["retrieved_documents"], start=1):
-            print(
-                f"{index}. {document['filename']} | "
-                f"date={document['date']} | distance={document['score']:.4f}"
-            )
-            print(f"   {document['content'].strip()}")
-    else:
-        print("No documents retrieved.")
 
-    print("\nResearch Results")
-    if final_state["research_results"]:
-        for index, result in enumerate(final_state["research_results"], start=1):
-            if result.get("type") == "paper":
-                print(f"{index}. [Paper] {result['title']} ({result['source']})")
-            elif result.get("type") == "repository":
-                print(f"{index}. [GitHub] {result['name']} | stars={result['stars']}")
-    else:
-        print("No research results.")
+def _ask_once(query: str) -> None:
+    response = ask_agent(query)
+    print(response.answer)
 
-    print("\nMemory")
-    print(final_state["memory"])
 
-    print("\nReport")
-    print(final_state["report"])
+def _interactive_loop() -> None:
+    print("Medical Research Agent chat mode")
+    print("Type your question. Use 'exit' or '退出' to stop.\n")
+
+    while True:
+        try:
+            query = input("You> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nStopped.")
+            return
+
+        if not query:
+            continue
+        if query.lower() in EXIT_COMMANDS:
+            print("Stopped.")
+            return
+
+        try:
+            response = ask_agent(query)
+        except Exception as exc:
+            print(f"Agent error: {exc}")
+            continue
+
+        print("\nAgent>\n")
+        print(response.answer)
+        print("")
 
 
 if __name__ == "__main__":

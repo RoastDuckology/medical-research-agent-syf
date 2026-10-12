@@ -12,3 +12,8 @@ pydantic
 sentence-transformers
 pytest
 requests
+torch
+torchvision
+transformers
+pdfplumber<0.11.5
+pypdf

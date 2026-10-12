@@ -61,7 +61,7 @@ def test_parse_github_response_returns_expected_shape():
 def test_registry_registers_and_runs_tools():
     registry = create_default_tool_registry()
 
-    assert [tool.name for tool in registry.list_tools()] == ["arxiv", "github"]
+    assert [tool.name for tool in registry.list_tools()] == ["arxiv", "github", "daily_brief"]
     assert registry.get("arxiv").description
 
 

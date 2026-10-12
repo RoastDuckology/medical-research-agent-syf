@@ -1,5 +1,9 @@
 """Tool registry for managing available research tools."""
 
+from __future__ import annotations
+
+import os
+
 from tools.base import BaseTool
 
 
@@ -42,9 +46,27 @@ def create_default_tool_registry() -> ToolRegistry:
     """Create the default registry used by the research node."""
 
     from tools.arxiv_tool import ArxivTool
+    from tools.daily_brief_tool import DailyBriefTool
+    from tools.fault_injection_tool import FaultInjectionTool
     from tools.github_tool import GithubTool
+    from tools.recorded_tool import RecordedTool
 
     registry = ToolRegistry()
-    registry.register(ArxivTool())
-    registry.register(GithubTool())
+    mode = os.getenv("RESEARCH_TOOL_MODE", "live").strip().lower()
+    if mode == "recorded":
+        recordings_dir = os.getenv("TOOL_RECORDINGS_DIR", "data/recordings")
+        registry.register(RecordedTool("arxiv", recordings_dir))
+        registry.register(RecordedTool("github", recordings_dir))
+    elif mode == "fault_injection":
+        component = os.getenv("TOOL_FAULT_COMPONENT", "arxiv").strip().lower()
+        failure_type = os.getenv("TOOL_FAULT_TYPE", "timeout").strip().lower()
+        registry.register(FaultInjectionTool(component, failure_type))
+        if component != "arxiv":
+            registry.register(RecordedTool("arxiv"))
+        if component != "github":
+            registry.register(RecordedTool("github"))
+    else:
+        registry.register(ArxivTool())
+        registry.register(GithubTool())
+    registry.register(DailyBriefTool())
     return registry

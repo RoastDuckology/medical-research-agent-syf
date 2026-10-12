@@ -6,7 +6,7 @@ import logging
 from typing import Any
 
 from config.settings import get_settings
-from rag.loader import load_markdown_documents
+from rag.loader import load_research_documents
 from rag.splitter import split_documents
 from rag.vector_store import index_documents
 
@@ -18,7 +18,14 @@ def build_or_update_index() -> dict[str, Any]:
     """Load Markdown logs, split them, and index them into Chroma."""
 
     settings = get_settings()
-    documents = load_markdown_documents(str(settings.logs_dir))
+    documents = load_research_documents(
+        str(settings.logs_dir),
+        settings.extra_markdown_files,
+        settings.paper_notes_dir,
+        settings.papers_dir,
+        settings.paper_text_dir,
+        settings.enable_pdf_ingestion,
+    )
     chunks = split_documents(documents)
     index_stats = index_documents(chunks) if chunks else {
         "added": 0,

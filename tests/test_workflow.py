@@ -12,26 +12,41 @@ class FakeLLM(BaseLLM):
     """Small deterministic LLM for workflow tests."""
 
     def generate(self, prompt: str) -> str:
-        return "# LLM Research Report\n\nStereoVLA workflow test report."
+        return (
+            "# LLM Research Report\n\n"
+            "需要进一步核查。Source: https://arxiv.org/abs/example\n"
+            "file: 2026-07-10.md"
+        )
 
 
 def test_workflow_returns_memory_research_results_and_report(tmp_path, monkeypatch):
+    class FakeTool:
+        def run(self, **kwargs):
+            return [{"type": "paper", "source": "arxiv", "url": "https://arxiv.org/abs/example"}]
+
     class FakeRegistry:
-        def run_all(self, **kwargs):
-            return [
-                {"type": "paper", "source": "arxiv", "title": kwargs["query"]},
-                {"type": "repository", "source": "github", "name": kwargs["query"]},
-            ]
+        def get(self, name):
+            return FakeTool()
 
     logs_dir = tmp_path / "logs"
     vector_dir = tmp_path / "vector_db"
+    notes_dir = tmp_path / "paper_notes"
+    papers_dir = tmp_path / "papers"
+    paper_text_dir = tmp_path / "paper_text"
     logs_dir.mkdir()
+    notes_dir.mkdir()
+    papers_dir.mkdir()
     (logs_dir / "2026-07-10.md").write_text(
         "# 2026-07-10\n\n今天完成 StereoVLA 特征提取接口测试。",
         encoding="utf-8",
     )
 
     monkeypatch.setenv("LOGS_DIR", str(logs_dir))
+    monkeypatch.setenv("EXTRA_MARKDOWN_FILES", "")
+    monkeypatch.setenv("PAPER_NOTES_DIR", str(notes_dir))
+    monkeypatch.setenv("PAPERS_DIR", str(papers_dir))
+    monkeypatch.setenv("PAPER_TEXT_DIR", str(paper_text_dir))
+    monkeypatch.setenv("ENABLE_PDF_INGESTION", "0")
     monkeypatch.setenv("VECTOR_DB_PATH", str(vector_dir))
     monkeypatch.setenv("CHROMA_COLLECTION_NAME", "test_workflow_logs")
     monkeypatch.setattr(
@@ -45,7 +60,7 @@ def test_workflow_returns_memory_research_results_and_report(tmp_path, monkeypat
 
     final_state = invoke(
         {
-            "query": "StereoVLA",
+            "query": "search arxiv StereoVLA papers",
             "memory": "",
             "retrieved_documents": [],
             "research_results": [],

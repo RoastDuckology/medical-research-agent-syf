@@ -1,0 +1,10 @@
+{"id": "failure-001", "component": "llm", "failure_type": "503_model_unavailable", "query": "总结当前实验记录中的StereoVLA路线", "expected_recovery": "mock_llm_fallback", "expected_answerable": true}
+{"id": "failure-002", "component": "llm", "failure_type": "timeout", "query": "比较LeWM和JEPA对本项目的启发", "expected_recovery": "mock_llm_fallback", "expected_answerable": true}
+{"id": "failure-003", "component": "arxiv", "failure_type": "http_500", "query": "搜索近7天arXiv医疗AI论文", "expected_recovery": "degraded_summary", "expected_answerable": true}
+{"id": "failure-004", "component": "github", "failure_type": "ssl_error", "query": "查找StereoVLA相关GitHub实现", "expected_recovery": "degraded_summary", "expected_answerable": true}
+{"id": "failure-005", "component": "retrieval", "failure_type": "empty_results", "query": "请回答一个当前知识库无关的烹饪问题", "expected_recovery": "selective_refusal", "expected_answerable": false}
+{"id": "failure-006", "component": "arxiv", "failure_type": "timeout", "query": "查找近15天具身智能顶会论文", "expected_recovery": "degraded_summary", "expected_answerable": true}
+{"id": "failure-007", "component": "github", "failure_type": "rate_limit", "query": "查找JEPA world model开源仓库", "expected_recovery": "degraded_summary", "expected_answerable": true}
+{"id": "failure-008", "component": "pdf", "failure_type": "parse_error", "query": "总结data/papers中的PDF内容", "expected_recovery": "cached_text_or_refusal", "expected_answerable": true}
+{"id": "failure-009", "component": "llm", "failure_type": "403_model_forbidden", "query": "生成每日AI简报", "expected_recovery": "mock_llm_fallback", "expected_answerable": true}
+{"id": "failure-010", "component": "retrieval", "failure_type": "low_confidence", "query": "当前知识库是否包含量子化学实验记录", "expected_recovery": "selective_refusal", "expected_answerable": false}
